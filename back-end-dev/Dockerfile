@@ -13,6 +13,8 @@ COPY Connector/__MAIN__/requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
+RUN apt-get -y install mono-complete
+
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get -y install nodejs
 
