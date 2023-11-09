@@ -13,7 +13,9 @@ COPY Connector/__MAIN__/requirements.txt requirements.txt
 
 RUN pip install -r requirements.txt
 
-RUN apt-get -y install mono-complete
+ENV TZ=Europe/Kyiv
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+RUN apt-get -y install mono-mcs
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get -y install nodejs
@@ -25,6 +27,10 @@ COPY Checker Checker
 WORKDIR /Connector/__MAIN__
 RUN npm install efrog@latest
 RUN npm update
+
+USER root
+RUN chmod -R go-r /Connector/__MAIN__
+RUN chmod -R go+r /Connector/__MAIN__/node_modules
 
 EXPOSE 8000
 EXPOSE 3306
