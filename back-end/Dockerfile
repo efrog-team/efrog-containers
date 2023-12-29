@@ -9,16 +9,16 @@ RUN apt-get -y install g++-11
 RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
 
-COPY Connector/__MAIN__/requirements.txt requirements.txt
-
-RUN pip install -r requirements.txt
-
 ENV TZ=Europe/Kyiv
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 RUN apt-get -y install mono-mcs
 
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
 RUN apt-get -y install nodejs
+
+COPY Connector/__MAIN__/requirements.txt requirements.txt
+
+RUN pip install -r requirements.txt
 
 COPY Connector/__MAIN__ Connector/__MAIN__
 

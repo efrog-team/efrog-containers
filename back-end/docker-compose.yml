@@ -1,0 +1,48 @@
+version: "3"
+services:
+    db:
+        container_name: back-end-db
+        build:
+            context: ../db
+            dockerfile: ./Dockerfile
+        volumes:
+            - ../volumes/db_data:/var/lib/mysql
+        healthcheck:
+            test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+            start_period: 3s
+            interval: 1s
+            timeout: 1s
+            retries: 1000
+    cache:
+        container_name: back-end-cache
+        build:
+            context: ../cache
+            dockerfile: ./Dockerfile
+        volumes:
+            - ../volumes/cache_data:/data
+        healthcheck:
+            test: redis-cli ping
+            start_period: 3s
+            interval: 1s
+            timeout: 1s
+            retries: 1000
+    app:
+        container_name: back-end-app
+        build:
+            context: ../../
+            dockerfile: ./Containers/back-end/Dockerfile
+        environment:
+            - DB_HOST=back-end-db
+            - DB_PORT=3306
+            - CACHE_HOST=back-end-cache
+            - CACHE_PORT=6379
+        ports:
+            - "8000:8000"
+        depends_on:
+            db:
+                condition: service_healthy
+            cache:
+                condition: service_healthy
+        links:
+          - db
+          - cache
