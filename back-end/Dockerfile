@@ -2,9 +2,18 @@ FROM ubuntu:22.04
 
 RUN apt-get update
 RUN apt-get -y install curl
+RUN apt-get -y install git
 
 RUN apt-get -y install gcc-11
 RUN apt-get -y install g++-11
+
+RUN git clone https://github.com/DaveGamble/cJSON.git
+WORKDIR /cJSON
+RUN gcc-11 -c cJSON.c -o cJSON.o
+RUN ar rcs libcjson.a cJSON.o
+RUN cp cJSON.h /usr/local/include/
+RUN cp libcjson.a /usr/local/lib/
+WORKDIR /
 
 RUN apt-get -y install python3
 RUN apt-get -y install python3-pip
@@ -26,6 +35,8 @@ RUN /back-end-venv/bin/pip install -r requirements.txt
 COPY Connector/__MAIN__ Connector/__MAIN__
 
 COPY Checker Checker
+
+COPY /Checker/compile_keys.json /Connector/__MAIN__
 
 WORKDIR /Connector/__MAIN__
 RUN npm install efrog@latest
